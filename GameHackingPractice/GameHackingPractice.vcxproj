@@ -126,12 +126,16 @@
     <ClCompile Include="GameHackingCh5.cpp" />
     <ClCompile Include="GameHackingCh6.cpp" />
     <ClCompile Include="GameHackingCh7.cpp" />
+    <ClCompile Include="GameHackingCh8.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="tools.cpp" />
+    <ClCompile Include="tools.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameHackingCh5.h" />
     <ClInclude Include="GameHackingCh6.h" />
     <ClInclude Include="GameHackingCh7.h" />
+    <ClInclude Include="GameHackingCh8.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
