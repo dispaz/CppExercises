@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <string>
 
 void temp();
 DWORD rebase(DWORD address, DWORD newBase);

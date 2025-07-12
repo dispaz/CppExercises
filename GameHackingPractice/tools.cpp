@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <tlhelp32.h>
+#include "GameHackingCh6.h"
 
 using namespace std;
 
@@ -44,4 +45,8 @@ DWORD getRemoteBaseAddress(HANDLE process) {
 
 	CloseHandle(thread);
 	return newBase;
+}
+
+DWORD getModuleBaseAddress() {
+	return (DWORD)GetModuleHandle(NULL);
 }

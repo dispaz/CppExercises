@@ -7,7 +7,6 @@ using namespace std;
 template <typename T>
 T readMemoryAPI(HANDLE process, LPVOID address) {
 	T value;
-	SIZE_T bytesRead;
 	if (ReadProcessMemory(process, address, &value, sizeof(T), NULL)) {
 		return value;
 	}
@@ -37,6 +36,21 @@ DWORD protectMemory(DWORD address, DWORD protection) {
 	return oldProt;
 }
 
-DWORD getModuleBaseAddress();
+template <typename T>
+DWORD protectMemoryAPI(HANDLE proc, DWORD address, DWORD protection) {
+	DWORD oldProt;
+	VirtualProtectEx(proc, (LPVOID)address, sizeof(T), protection, &oldProt);
+	return oldProt;
+}
+
+template <int SIZE>
+void writeNOP(HANDLE proc, DWORD address) {
+	auto oldProtection = protectMemoryAPI<BYTE[SIZE]>(proc, address, PAGE_EXECUTE_READWRITE);
+	for (int i = 0; i < SIZE; i++) {
+		writeMemoryAPI<BYTE>(proc, (LPVOID)(address + i), 0x90);
+	}
+	protectMemoryAPI<BYTE[SIZE]>(proc, address, oldProtection);
+}
+
 HANDLE getHandleByName(std::wstring moduleName);
 DWORD getRemoteBaseAddress(HANDLE process);
