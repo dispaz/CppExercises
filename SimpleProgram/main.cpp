@@ -19,8 +19,7 @@ void ch8Test() {
 	cout << "Func addr: " << &printRunningN << endl; // 007E1483
 	cout << "Sleep() addr: " << &Sleep << endl; // 774AD720
 	cin.get();
-	cout << "Running printRunningN(5)." << endl;
-	printRunningN(5);
+	MessageBoxA(NULL, "MessageBoxA text", "MessageBoxA title", MB_OK);
 }
 
 void injectionTest()

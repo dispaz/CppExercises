@@ -132,6 +132,7 @@
     <ClCompile Include="tools.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="common.h" />
     <ClInclude Include="GameHackingCh5.h" />
     <ClInclude Include="GameHackingCh6.h" />
     <ClInclude Include="GameHackingCh7.h" />
