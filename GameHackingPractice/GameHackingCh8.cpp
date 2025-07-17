@@ -11,7 +11,7 @@ const wchar_t* captionText = L"HOOKED!";
 
 void Chapter8Runner::run() {
 	cout << "###### Chapter 8 ######" << endl;
-	callHookingFunction();	
+	callHookingFunction();
 }
 
 void Chapter8Runner::doNOPFunction() {
@@ -44,38 +44,54 @@ void Chapter8Runner::callHookingFunction() {
 		cout << "Process not found!" << endl;
 		return;
 	}
-	auto msgAddrToWrite = allocateAndWriteStringToProc(proc, msgText);
-	auto captionAddrToWrite = allocateAndWriteStringToProc(proc, captionText);
-	cout << "Message and caption written to process memory." << endl;
 
 	BYTE hookCode[] = {
 		0x8B, 0xF4, // mov esi, esp
-		0x68, 0x00, 0x04, 0x00, 0x00, // push 40000 (type of message box) - 4th
+		0x68, 0x00, 0x00, 0x04, 0x00, // push 40000 (type of message box) - 4th
 		0x68, 0x00, 0x00, 0x00, 0x00, // push address caption text - 3rd
 		0x68, 0x00, 0x00, 0x00, 0x00, // push address of msg text - 2nd
 		0x6A, 0x00, // push 0 (wnd) - 1st
-		0xFF, 0x15, 0xA0, 0x15, 0xAF, 0x75, // call dword ptr ds:MessageBoxA [0x75AF15A0]
-		0x3B, 0xF4 // cmp esi, esp
+		//0041D134
+		0xFF, 0x15, 0x34, 0xD1, 0x41, 0x00, // call dword ptr ds:MessageBoxA [0x75AF15A0]
+		0x3B, 0xF4, // cmp esi, esp
+		0xC3, //retn
+		0x90, 0x90
 	};
 
-	memcpy(&hookCode[8], &captionAddrToWrite, 4); // Copy the address of msgText into the hook code
-	memcpy(&hookCode[12], &msgAddrToWrite, 4); // Copy the address of msgText into the hook code
+	int hookCodeSize = sizeof(hookCode);
+	int msgTextSize = wcslen(msgText) * sizeof(wchar_t) + sizeof(wchar_t); // +1 for null terminator
+	int captionTextSize = wcslen(captionText) * sizeof(wchar_t) + sizeof(wchar_t); // +1 for null terminator
+	int fullLen = hookCodeSize + msgTextSize + captionTextSize;
 
-	LPVOID hookAddr = VirtualAllocEx(proc, NULL, sizeof(hookCode), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	if(hookAddr == NULL) {
-		cout << "VirtualAllocEx failed!" << endl;
+	cout << "Hook code size: " << hookCodeSize << "\nmsgTextSize: " << msgTextSize << "\ncaptionTextSize: " << captionTextSize << endl;
+
+	LPVOID allocatedAddr = VirtualAllocEx(proc, NULL, fullLen, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	LPVOID msgTextAddr = (LPVOID)((DWORD)allocatedAddr + captionTextSize);
+	LPVOID hookCodeAddr = (LPVOID)((DWORD)msgTextAddr + msgTextSize);
+
+	cout << "Allocated memory at: " << hex << allocatedAddr << "\nMessage text address: " << hex << msgTextAddr << "\nHook code address: " << hex << hookCodeAddr << endl;
+
+	memcpy(&hookCode[8], &allocatedAddr, 4); // Copy the address of msgText into the hook code
+	memcpy(&hookCode[13], &msgTextAddr, 4); // Copy the address of msgText into the hook code
+
+	if (WriteProcessMemory(proc, msgTextAddr, msgText, msgTextSize, NULL) == 0) {
+		cout << "WriteProcessMemory failed!" << endl;
 		return;
 	}
 
-	if(WriteProcessMemory(proc, hookAddr, hookCode, sizeof(hookCode), NULL) == 0) {
+	if(WriteProcessMemory(proc, allocatedAddr, captionText, captionTextSize, NULL) == 0) {
 		cout << "WriteProcessMemory failed!" << endl;
-		VirtualFreeEx(proc, hookAddr, 0, MEM_RELEASE);
+		return;
+	}
+
+	if(WriteProcessMemory(proc, hookCodeAddr, hookCode, sizeof(hookCode), NULL) == 0) {
+		cout << "WriteProcessMemory failed!" << endl;
 		return;
 	}
 }
 
 void Chapter8Runner::hookedFunction2() {
-	MessageBoxA(NULL, "Function hooked", "", MB_OK | MB_TOPMOST);
+	MessageBoxW(NULL, msgText, captionText, MB_OK | MB_TOPMOST);
 }
 
 LPVOID Chapter8Runner::allocateAndWriteStringToProc(HANDLE proc, const wchar_t* str) {
