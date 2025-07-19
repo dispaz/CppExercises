@@ -9,16 +9,13 @@ void ch8Test();
 void printRunningN(int n);
 
 int main() {
+	cout << "Here would be call hook" << endl;
 	ch8Test();
 	std::cin.get();
 	return 0;
 }
 
 void ch8Test() {
-	cout << "####### Chapter 8 Test #######" << endl;
-	cout << "Func addr: " << &printRunningN << endl; // 007E1483
-	cout << "Sleep() addr: " << &Sleep << endl; // 774AD720
-	cin.get();
 	MessageBoxW(NULL, L"MessageBoxA text", L"MessageBoxA title", MB_OK);
 }
 

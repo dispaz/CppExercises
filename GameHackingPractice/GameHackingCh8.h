@@ -10,7 +10,8 @@ public:
 
 private:
     void doNOPFunction();
-    void callHookingFunction();  
+    void callHookingFunction();
+    LPVOID writeShellCodeToProc(HANDLE proc);
     void hookedFunction2();
     LPVOID allocateAndWriteStringToProc(HANDLE proc, const wchar_t* str);
 };
