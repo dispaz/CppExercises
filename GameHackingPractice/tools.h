@@ -5,12 +5,22 @@
 using namespace std;
 
 template <typename T>
+T readMemory(DWORD address) {
+	return *((T*)address);
+}
+
+template <typename T>
 T readMemoryAPI(HANDLE process, LPVOID address) {
 	T value;
 	if (ReadProcessMemory(process, address, &value, sizeof(T), NULL)) {
 		return value;
 	}
 	return NULL;
+}
+
+template <typename T>
+void writeMemory(DWORD address, T value) {
+	*((T*)address) = value;
 }
 
 template <typename T>
@@ -22,11 +32,6 @@ void writeMemoryAPI(HANDLE process, LPVOID address, T value) {
 	else {
 		cout << "Failed to write value." << endl;
 	}
-}
-
-template <typename T>
-T readValueAtAddress(LPVOID address) {
-	return *((T*)address);
 }
 
 template <typename T>

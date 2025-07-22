@@ -1,20 +1,17 @@
 #include <Windows.h>
+#include "tools.h"
 #include <iostream>
 #include <TlHelp32.h>
 
 using namespace std;
 
-template <typename T>
-T readValueAtAddress(LPVOID address) {
-	return *((T*)address);
-}
 
 void temp() {
 	int variable = 12345;
 	LPVOID address = &variable;
 	
 	cout << "Variable address: " << address << endl;
-	int readVar = readValueAtAddress<int>(address);
+	int readVar = readMemory<int>((DWORD)address);
 	cout << "Variable value: " << readVar << endl;
 	
 	cin.get();

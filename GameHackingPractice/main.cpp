@@ -5,13 +5,14 @@
 #include "main.h"
 #include "GameHackingCh7.h"
 #include "GameHackingCh8.h"
+#include "Chapter8VF.h"
 #include "tools.h"
 #include "common.h"
 
 using namespace std;
 
 int main() {
-	unique_ptr<IChapterRunner> runner = make_unique<Chapter8Runner>();
+	unique_ptr<IChapterRunner> runner = make_unique<Chapter8VFRunner>();
 	runner->run();
 	cin.get();
 	return 0;

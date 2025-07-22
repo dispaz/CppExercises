@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Chapter 8">
+      <UniqueIdentifier>{024ad92d-d433-4c00-8ffe-8c23eb73ef0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Chapter 8">
+      <UniqueIdentifier>{72bd325d-456f-4a8c-a9bc-6c78109910f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,14 +33,17 @@
     <ClCompile Include="GameHackingCh7.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameHackingCh8.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tools.h">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="tools.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameHackingCh8.cpp">
+      <Filter>Source Files\Chapter 8</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter8VF.cpp">
+      <Filter>Source Files\Chapter 8</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,11 +59,14 @@
     <ClInclude Include="GameHackingCh7.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameHackingCh8.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="common.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameHackingCh8.h">
+      <Filter>Header Files\Chapter 8</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter8VF.h">
+      <Filter>Header Files\Chapter 8</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

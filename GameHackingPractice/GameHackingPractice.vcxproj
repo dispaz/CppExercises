@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Chapter8VF.cpp" />
     <ClCompile Include="GameHackingCh5.cpp" />
     <ClCompile Include="GameHackingCh6.cpp" />
     <ClCompile Include="GameHackingCh7.cpp" />
@@ -132,6 +133,7 @@
     <ClCompile Include="tools.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Chapter8VF.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="GameHackingCh5.h" />
     <ClInclude Include="GameHackingCh6.h" />
