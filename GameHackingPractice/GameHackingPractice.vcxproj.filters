@@ -45,6 +45,9 @@
     <ClCompile Include="Chapter8VF.cpp">
       <Filter>Source Files\Chapter 8</Filter>
     </ClCompile>
+    <ClCompile Include="Chapter8IAT.cpp">
+      <Filter>Source Files\Chapter 8</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameHackingCh5.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files\Chapter 8</Filter>
     </ClInclude>
     <ClInclude Include="Chapter8VF.h">
+      <Filter>Header Files\Chapter 8</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter8IAT.h">
       <Filter>Header Files\Chapter 8</Filter>
     </ClInclude>
   </ItemGroup>

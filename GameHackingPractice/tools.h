@@ -5,6 +5,12 @@
 using namespace std;
 
 template <typename T>
+T* pointMemory(DWORD address) 
+{
+	return ((T*)address);
+}
+
+template <typename T>
 T readMemory(DWORD address) {
 	return *((T*)address);
 }
