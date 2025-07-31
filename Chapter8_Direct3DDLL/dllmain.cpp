@@ -1,5 +1,8 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
+#include <windows.h>
+#include <d3d9.h>
+//#include <d3dx9.h
 
 DWORD WINAPI LoopFunction(LPVOID lpParam) {
 	MessageBox(NULL, L"DLL attached", L"Direct3D Hook", MB_OK);
