@@ -3,7 +3,39 @@
 #include "tools.h"
 #include <d3d9.h>
 
+
+DWORD __stdcall reportInitEndScene(LPDIRECT3DDEVICE9 device) {
+    return DirectXHook::getInstance()->initHookCallback(device);
+}
+
+__declspec(naked) void endSceneTrampoline() {
+    __asm {
+        MOV EAX, DWORD PTR SS:[ESP + 0x4]
+        PUSH EAX
+        CALL reportInitEndScene
+        JMP EAX
+    }
+}
+
+DirectXHook* DirectXHook::instance = nullptr;
+LPDIRECT3DDEVICE9 DirectXHook::hookedDevice = NULL;
+unsigned char* DirectXHook::originalEndSceneCode = NULL;
+DWORD DirectXHook::endSceneAddress = NULL;
+
+void DirectXHook::init() {
+    OutputDebugStringA("init() - started!\n");
+    while(!GetModuleHandleA("d3d9.dll")) {
+        Sleep(100);
+	}
+    DirectXHook::endSceneAddress = locateEndScene();
+
+    if (endSceneAddress) {
+        DirectXHook::getInstance()->originalEndSceneCode = hookWithJump(endSceneAddress, (DWORD)&endSceneTrampoline);
+    }
+}
+
 DWORD DirectXHook::locateEndScene() {
+    OutputDebugStringA("locating EndScene address\n");
     WNDCLASSEXA wc =
     {
         sizeof(WNDCLASSEX),
@@ -68,6 +100,8 @@ DWORD DirectXHook::getVF(DWORD classInst, DWORD funcIndex) {
 }
 
 unsigned char* DirectXHook::hookWithJump(DWORD hookAt, DWORD newFunc) {
+    OutputDebugStringA("running hookWithJump\n");
+
     DWORD newOffset = newFunc - hookAt - 5;
 	auto oldProtection = protectMemory<BYTE[5]>(hookAt, PAGE_EXECUTE_READWRITE);
 	unsigned char* originals = new unsigned char[5];
@@ -89,6 +123,17 @@ void DirectXHook::unhookWithJump(DWORD hookAt, unsigned char* originalBytes) {
 	delete[] originalBytes;
 }
 
-/**
-* Write callbacks, so when hooked, we can store pointer to device
-*/
+DWORD DirectXHook::initHookCallback(LPDIRECT3DDEVICE9 device) {
+    DirectXHook::hookedDevice = device;
+    while (DirectXHook::originalEndSceneCode == nullptr) {}
+    unhookWithJump(DirectXHook::endSceneAddress, DirectXHook::originalEndSceneCode);
+	DirectXHook::getInstance()->placeHooks();
+    return endSceneAddress;
+}
+
+void DirectXHook::placeHooks() {
+	MessageBox(nullptr, L"DirectX Hook Initialized", L"Info", MB_OK | MB_ICONINFORMATION);
+    /*
+	* Hooks can be placed here for other DirectX functions.
+    */
+}
