@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include "D3DHack.h"
 #include <d3d9.h>
 
 class DirectXHook {
@@ -26,13 +27,17 @@ public:
 	void unhookWithJump(DWORD hookAt, unsigned char* originalBytes);
 	DWORD initHookCallback(LPDIRECT3DDEVICE9 device);
 private:
-	DirectXHook(void) {};
+	DirectXHook(void) 
+	{
+		hack = D3DHack();
+	};
 	~DirectXHook(void) {};
 
 	static DirectXHook* instance;
 	static LPDIRECT3DDEVICE9 hookedDevice;
 	static unsigned char* originalEndSceneCode;
 	static DWORD endSceneAddress;
+	D3DHack hack;
 	DWORD locateEndScene();
 	DWORD getVF(DWORD classInst, DWORD funcIndex);
 	void placeHooks();

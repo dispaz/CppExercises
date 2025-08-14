@@ -24,6 +24,9 @@
     <ClInclude Include="DirectXHook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="D3DHack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -33,6 +36,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DirectXHook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DHack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

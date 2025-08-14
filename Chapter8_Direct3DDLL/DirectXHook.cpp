@@ -5,6 +5,7 @@
 
 
 DWORD __stdcall reportInitEndScene(LPDIRECT3DDEVICE9 device) {
+	cout << "Running reportInitEndScene..." << endl;
     return DirectXHook::getInstance()->initHookCallback(device);
 }
 
@@ -23,7 +24,7 @@ unsigned char* DirectXHook::originalEndSceneCode = NULL;
 DWORD DirectXHook::endSceneAddress = NULL;
 
 void DirectXHook::init() {
-    OutputDebugStringA("init() - started!\n");
+	cout << "Initializing DirectX Hook..." << endl;
     while(!GetModuleHandleA("d3d9.dll")) {
         Sleep(100);
 	}
@@ -35,7 +36,7 @@ void DirectXHook::init() {
 }
 
 DWORD DirectXHook::locateEndScene() {
-    OutputDebugStringA("locating EndScene address\n");
+	cout << "Locating EndScene..." << endl;
     WNDCLASSEXA wc =
     {
         sizeof(WNDCLASSEX),
@@ -47,6 +48,7 @@ DWORD DirectXHook::locateEndScene() {
         "DX", NULL
     };
 
+    RegisterClassExA(&wc);
     HWND hWnd = CreateWindowA(
         "DX",
         NULL,
@@ -100,7 +102,7 @@ DWORD DirectXHook::getVF(DWORD classInst, DWORD funcIndex) {
 }
 
 unsigned char* DirectXHook::hookWithJump(DWORD hookAt, DWORD newFunc) {
-    OutputDebugStringA("running hookWithJump\n");
+	cout << "Running hookWithJump..." << endl;
 
     DWORD newOffset = newFunc - hookAt - 5;
 	auto oldProtection = protectMemory<BYTE[5]>(hookAt, PAGE_EXECUTE_READWRITE);
@@ -115,6 +117,7 @@ unsigned char* DirectXHook::hookWithJump(DWORD hookAt, DWORD newFunc) {
 }
 
 void DirectXHook::unhookWithJump(DWORD hookAt, unsigned char* originalBytes) {
+    cout << "Running unhookWithJump..." << endl;
 	auto oldProtection = protectMemory<BYTE[5]>(hookAt, PAGE_EXECUTE_READWRITE);
     for (int i = 0; i < 5; i++) {
 		writeMemory<unsigned char>(hookAt + i, originalBytes[i]);
@@ -124,6 +127,7 @@ void DirectXHook::unhookWithJump(DWORD hookAt, unsigned char* originalBytes) {
 }
 
 DWORD DirectXHook::initHookCallback(LPDIRECT3DDEVICE9 device) {
+	cout << "Running initHookCallback..." << endl;
     DirectXHook::hookedDevice = device;
     while (DirectXHook::originalEndSceneCode == nullptr) {}
     unhookWithJump(DirectXHook::endSceneAddress, DirectXHook::originalEndSceneCode);
@@ -132,7 +136,11 @@ DWORD DirectXHook::initHookCallback(LPDIRECT3DDEVICE9 device) {
 }
 
 void DirectXHook::placeHooks() {
-	MessageBox(nullptr, L"DirectX Hook Initialized", L"Info", MB_OK | MB_ICONINFORMATION);
+    cout << "Placing hooks..." << endl;
+	hack.handleHacksOnOff(hookedDevice);
+    // Here you can place additional hooks or perform other initialization tasks.
+    // For example, you might want to hook other DirectX functions or set up logging.
+    
     /*
 	* Hooks can be placed here for other DirectX functions.
     */
