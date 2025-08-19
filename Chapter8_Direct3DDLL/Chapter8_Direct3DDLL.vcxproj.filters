@@ -41,5 +41,14 @@
     <ClCompile Include="D3DHack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DirectXHookCallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectXHookCallbacks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

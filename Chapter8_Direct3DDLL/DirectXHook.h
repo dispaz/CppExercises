@@ -3,6 +3,12 @@
 #include <Windows.h>
 #include "D3DHack.h"
 #include <d3d9.h>
+#include <vector>
+
+#define DX_API HRESULT WINAPI
+
+typedef HRESULT(WINAPI* _endScene)(LPDIRECT3DDEVICE9 pDevice);
+//typedef _drawFrameCallback(LPDIRECT3DDEVICE9);
 
 class DirectXHook {
 public:
@@ -26,6 +32,7 @@ public:
 	unsigned char* hookWithJump(DWORD hookAt, DWORD newFunc);
 	void unhookWithJump(DWORD hookAt, unsigned char* originalBytes);
 	DWORD initHookCallback(LPDIRECT3DDEVICE9 device);
+	DX_API endSceneHookCallback(LPDIRECT3DDEVICE9 device);
 private:
 	DirectXHook(void) 
 	{
@@ -36,9 +43,9 @@ private:
 	static DirectXHook* instance;
 	static LPDIRECT3DDEVICE9 hookedDevice;
 	static unsigned char* originalEndSceneCode;
+	static _endScene originalEndScene;
 	static DWORD endSceneAddress;
 	D3DHack hack;
 	DWORD locateEndScene();
-	DWORD getVF(DWORD classInst, DWORD funcIndex);
 	void placeHooks();
 };

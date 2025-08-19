@@ -1,27 +1,23 @@
 #include "pch.h"
+#include "DirectXHookCallbacks.h"
 #include "DirectXHook.h"
 #include "tools.h"
 #include <d3d9.h>
 
-
-DWORD __stdcall reportInitEndScene(LPDIRECT3DDEVICE9 device) {
-	cout << "Running reportInitEndScene..." << endl;
-    return DirectXHook::getInstance()->initHookCallback(device);
-}
+DirectXHook* DirectXHook::instance = nullptr;
+LPDIRECT3DDEVICE9 DirectXHook::hookedDevice = NULL;
+unsigned char* DirectXHook::originalEndSceneCode = NULL;
+_endScene DirectXHook::originalEndScene = NULL;
+DWORD DirectXHook::endSceneAddress = NULL;
 
 __declspec(naked) void endSceneTrampoline() {
     __asm {
-        MOV EAX, DWORD PTR SS:[ESP + 0x4]
+        MOV EAX, DWORD PTR SS : [ESP + 0x4]
         PUSH EAX
         CALL reportInitEndScene
         JMP EAX
     }
 }
-
-DirectXHook* DirectXHook::instance = nullptr;
-LPDIRECT3DDEVICE9 DirectXHook::hookedDevice = NULL;
-unsigned char* DirectXHook::originalEndSceneCode = NULL;
-DWORD DirectXHook::endSceneAddress = NULL;
 
 void DirectXHook::init() {
 	cout << "Initializing DirectX Hook..." << endl;
@@ -94,13 +90,6 @@ DWORD DirectXHook::locateEndScene() {
     return endSceneAddress;
 }
 
-DWORD DirectXHook::getVF(DWORD classInst, DWORD funcIndex) {
-    DWORD vfTable = readMemory<DWORD>(classInst);
-	DWORD hookAddr = vfTable + (funcIndex * sizeof(DWORD));
-    
-    return readMemory<DWORD>(hookAddr);
-}
-
 unsigned char* DirectXHook::hookWithJump(DWORD hookAt, DWORD newFunc) {
 	cout << "Running hookWithJump..." << endl;
 
@@ -131,13 +120,24 @@ DWORD DirectXHook::initHookCallback(LPDIRECT3DDEVICE9 device) {
     DirectXHook::hookedDevice = device;
     while (DirectXHook::originalEndSceneCode == nullptr) {}
     unhookWithJump(DirectXHook::endSceneAddress, DirectXHook::originalEndSceneCode);
-	DirectXHook::getInstance()->placeHooks();
+	this->placeHooks();
     return endSceneAddress;
+}
+
+DX_API DirectXHook::endSceneHookCallback(LPDIRECT3DDEVICE9 device) {
+    cout << "Running endSceneHookCallback..." << endl;
+	auto result = originalEndScene(device);
+    return result;
 }
 
 void DirectXHook::placeHooks() {
     cout << "Placing hooks..." << endl;
-	hack.handleHacksOnOff(hookedDevice);
+    DWORD orig = hookVF((DWORD)DirectXHook::hookedDevice, 42, (DWORD)&endSceneCallback);
+    if (orig != (DWORD)&endSceneCallback) 
+    {
+        originalEndScene = (_endScene)orig;
+    }
+	//hack.handleHacksOnOff(hookedDevice);
     // Here you can place additional hooks or perform other initialization tasks.
     // For example, you might want to hook other DirectX functions or set up logging.
     

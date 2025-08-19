@@ -26,12 +26,12 @@ void Chapter8VFRunner::run() {
 	cout << "Running Chapter8VFRunner" << endl;
 	DerivedClassVFHook* instance = new DerivedClassVFHook();
 
-	originalVF = hookVF((DWORD)instance, 0, (DWORD)&newFunction);
+	originalVF = hookVirtualFun((DWORD)instance, 0, (DWORD)&newFunction);
 	instance->virtualFun(0);
 	delete instance;
 }
 
-DWORD Chapter8VFRunner::hookVF(DWORD classInstance, DWORD funId, DWORD newFunc) {
+DWORD Chapter8VFRunner::hookVirtualFun(DWORD classInstance, DWORD funId, DWORD newFunc) {
 	DWORD VFTable = readMemory<DWORD>(classInstance);
 	DWORD hookAddr = VFTable + funId * sizeof(DWORD);
 	cout << "Class instance address: " << hex << classInstance

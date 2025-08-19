@@ -63,6 +63,10 @@ void writeNOP(HANDLE proc, DWORD address) {
 	protectMemoryAPI<BYTE[SIZE]>(proc, address, oldProtection);
 }
 
+DWORD getVF(DWORD classInst, DWORD funcIndex);
+
+DWORD hookVF(DWORD classInst, DWORD funcIndex, DWORD newFunc);
+
 HANDLE getHandleByName(std::wstring moduleName);
 DWORD getRemoteBaseAddress(HANDLE process);
 

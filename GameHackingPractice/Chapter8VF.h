@@ -5,7 +5,7 @@ class Chapter8VFRunner : public IChapterRunner {
 public:
 	void run() override;
 private:
-	DWORD hookVF(DWORD classInstance, DWORD funId, DWORD newFunc);
+	DWORD hookVirtualFun(DWORD classInstance, DWORD funId, DWORD newFunc);
 };
 
 class BaseClassVFHook {
