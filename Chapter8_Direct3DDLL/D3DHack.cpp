@@ -9,14 +9,18 @@ void D3DHack::handleHacksOnOff(LPDIRECT3DDEVICE9 pDevice)
 	cout << "Handling hacks on/off..." << endl;
 	if (!lightHackEnabled)
 	{
-		if (GetAsyncKeyState(VK_NUMPAD0))
+		if (GetAsyncKeyState(VK_F1))
 		{
 			cout << "F1 pressed: Enabling light hack." << endl;
 			enableLightHackDirectional(pDevice);
 		}
-	}
 
-	enableLightHackAmbient(pDevice);
+		if(GetAsyncKeyState(VK_F2))
+		{
+			cout << "F2 pressed: Enabling ambient light hack." << endl;
+			enableLightHackAmbient(pDevice);
+		}
+	}
 }
 
 void D3DHack::enableLightHackDirectional(LPDIRECT3DDEVICE9 pDevice) 

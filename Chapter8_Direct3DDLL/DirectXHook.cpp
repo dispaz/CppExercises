@@ -8,6 +8,7 @@ DirectXHook* DirectXHook::instance = nullptr;
 LPDIRECT3DDEVICE9 DirectXHook::hookedDevice = NULL;
 unsigned char* DirectXHook::originalEndSceneCode = NULL;
 _endScene DirectXHook::originalEndScene = NULL;
+_drawPrimitive DirectXHook::origDrawPrimitive = NULL;
 DWORD DirectXHook::endSceneAddress = NULL;
 
 __declspec(naked) void endSceneTrampoline() {
@@ -120,6 +121,8 @@ DWORD DirectXHook::initHookCallback(LPDIRECT3DDEVICE9 device) {
     DirectXHook::hookedDevice = device;
     while (DirectXHook::originalEndSceneCode == nullptr) {}
     unhookWithJump(DirectXHook::endSceneAddress, DirectXHook::originalEndSceneCode);
+    D3DXCreateFont(DirectXHook::hookedDevice, 15, 0, FW_BOLD, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Arial", &this->font);
+
 	this->placeHooks();
     return endSceneAddress;
 }
@@ -127,17 +130,59 @@ DWORD DirectXHook::initHookCallback(LPDIRECT3DDEVICE9 device) {
 DX_API DirectXHook::endSceneHookCallback(LPDIRECT3DDEVICE9 device) {
     cout << "Running endSceneHookCallback..." << endl;
 	auto result = originalEndScene(device);
+    placeHooks();
     return result;
 }
 
+DX_API DirectXHook::drawPrimitiveHookCallback(LPDIRECT3DDEVICE9 device, DWORD primType, UINT StartVertex, UINT PrimitiveCount) 
+{
+	cout << "Running drawPrimitiveHookCallback..." << endl;
+	this->drawText(10, 10, D3DCOLOR_ARGB(255, 255, 0, 0), "DrawPrimitive called!");
+	return origDrawPrimitive(device, primType, StartVertex, PrimitiveCount);
+}
+
+void DirectXHook::drawText(int x, int y, D3DCOLOR color, const char* text, ...)
+{
+    RECT rect;
+    va_list va_alist;
+    char buf[256] = { 0 };
+
+    va_start(va_alist, text);
+    _vsnprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), text, va_alist);
+    va_end(va_alist);
+
+    rect.left = x + 1;
+    rect.top = y + 1;
+    rect.right = rect.left + 1000;
+    rect.bottom = rect.top + 1000;
+
+    this->font->DrawTextA(NULL, buf, -1, &rect, 0, D3DCOLOR_ARGB(255, 10, 10, 10));
+    rect.left--;
+    rect.top--;
+    this->font->DrawTextA(NULL, buf, -1, &rect, 0, color);
+}
+
+
 void DirectXHook::placeHooks() {
     cout << "Placing hooks..." << endl;
-    DWORD orig = hookVF((DWORD)DirectXHook::hookedDevice, 42, (DWORD)&endSceneCallback);
-    if (orig != (DWORD)&endSceneCallback) 
+    
+    static const DWORD VFHookCount = 2;
+    static VFHookInfo vfHooks[VFHookCount] =
     {
-        originalEndScene = (_endScene)orig;
-    }
-	//hack.handleHacksOnOff(hookedDevice);
+        VFHookInfo(42, (DWORD)&endSceneCallback, (DWORD*)&originalEndScene),
+        VFHookInfo(81, (DWORD)&drawPrimitiveCallback, (DWORD*)&origDrawPrimitive)
+        //VFHookInfo(81, (DWORD)&drawIndexedPrimitiveCallback, (DWORD*)&originalIndexedDrawPrimitive)
+    };
+
+    for(int i = 0; i < VFHookCount; i++) 
+    {
+        DWORD orig = hookVF((DWORD)DirectXHook::hookedDevice, vfHooks[i].index, vfHooks[i].callback);
+        if (orig != vfHooks[i].callback)
+        {
+            *vfHooks[i].original = orig;
+        }
+	}
+    hack.handleHacksOnOff(DirectXHook::hookedDevice);
     // Here you can place additional hooks or perform other initialization tasks.
     // For example, you might want to hook other DirectX functions or set up logging.
     

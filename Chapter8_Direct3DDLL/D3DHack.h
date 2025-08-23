@@ -11,4 +11,3 @@ private:
 	void enableLightHackDirectional(LPDIRECT3DDEVICE9 pDevice);
 	void enableLightHackAmbient(LPDIRECT3DDEVICE9 pDevice);
 };
-
