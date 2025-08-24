@@ -137,7 +137,7 @@ DX_API DirectXHook::endSceneHookCallback(LPDIRECT3DDEVICE9 device) {
 DX_API DirectXHook::drawPrimitiveHookCallback(LPDIRECT3DDEVICE9 device, DWORD primType, UINT StartVertex, UINT PrimitiveCount) 
 {
 	cout << "Running drawPrimitiveHookCallback..." << endl;
-	this->drawText(10, 10, D3DCOLOR_ARGB(255, 255, 0, 0), "DrawPrimitive called!");
+	//this->drawText(10, 10, D3DCOLOR_ARGB(255, 255, 0, 0), "DrawPrimitive called!");
 	return origDrawPrimitive(device, primType, StartVertex, PrimitiveCount);
 }
 

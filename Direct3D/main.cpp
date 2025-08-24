@@ -15,6 +15,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
+
 // include the Direct3D Library files
 #pragma comment (lib, "d3d9.lib")
 #pragma comment (lib, "d3dx9.lib")
@@ -22,14 +23,17 @@
 // global declarations
 LPDIRECT3D9 d3d;
 LPDIRECT3DDEVICE9 d3ddev;
-LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;
+LPDIRECT3DVERTEXBUFFER9 cube_v_buffer = NULL;
 LPDIRECT3DINDEXBUFFER9 i_buffer = NULL;
+LPDIRECT3DVERTEXBUFFER9 tetra_v_buffer = NULL;
 
 // function prototypes
 void initD3D(HWND hWnd);
 void render_frame(void);
 void cleanD3D(void);
 void init_graphics(void);
+void init_cube();
+void init_tetrahedron();
 void init_light(void);    // sets up the light and the material
 
 struct CUSTOMVERTEX { FLOAT X, Y, Z; D3DVECTOR NORMAL; };
@@ -144,7 +148,7 @@ void initD3D(HWND hWnd)
     LoadLibrary(L"Chapter8_Direct3DDLL.dll");
 }
 
-
+bool shouldRotate = false;
 // this is the function used to render a single frame
 void render_frame(void)
 {
@@ -158,9 +162,9 @@ void render_frame(void)
 
     // set the view transform
     D3DXMATRIX matView;
-    D3DXVECTOR3 camPos = D3DXVECTOR3(0.0f, 8.0f, 25.0f);
+    D3DXVECTOR3 camPos = D3DXVECTOR3(-10.0f, 8.0f, 25.0f);
 	D3DXVECTOR3 lookAtPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	D3DXVECTOR3 upDirection = D3DXVECTOR3(1.0f, 1.0f, 0.0f);
+	D3DXVECTOR3 upDirection = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
     D3DXMatrixLookAtLH(&matView,
         &camPos, // the camera position
         &lookAtPos,      // the look-at position
@@ -179,15 +183,26 @@ void render_frame(void)
     // set the world transform
     static float index = 0.0f; index += 0.03f;
     D3DXMATRIX matRotateY;
-    D3DXMatrixRotationY(&matRotateY, index);
-    d3ddev->SetTransform(D3DTS_WORLD, &(matRotateY));
+    if (shouldRotate)
+    {
+        D3DXMatrixRotationY(&matRotateY, index);
+        d3ddev->SetTransform(D3DTS_WORLD, &(matRotateY));
+    }
 
+    if(GetAsyncKeyState(VK_F2))
+    {
+        shouldRotate = !shouldRotate;
+        Sleep(200);
+	}
     // select the vertex and index buffers to use
-    d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
+    d3ddev->SetStreamSource(0, cube_v_buffer, 0, sizeof(CUSTOMVERTEX));
     d3ddev->SetIndices(i_buffer);
 
     // draw the cube
     d3ddev->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 24, 0, 12);
+
+	d3ddev->SetStreamSource(0, tetra_v_buffer, 0, sizeof(CUSTOMVERTEX));
+    d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 4);
 
     d3ddev->EndScene();
 
@@ -198,7 +213,8 @@ void render_frame(void)
 // this is the function that cleans up Direct3D and COM
 void cleanD3D(void)
 {
-    v_buffer->Release();
+    cube_v_buffer->Release();
+    tetra_v_buffer->Release();
     i_buffer->Release();
     d3ddev->Release();
     d3d->Release();
@@ -208,8 +224,14 @@ void cleanD3D(void)
 // this is the function that puts the 3D models into video RAM
 void init_graphics(void)
 {
+    init_cube();
+    init_tetrahedron();
+}
+
+void init_cube()
+{
     // create the vertices using the CUSTOMVERTEX struct
-    CUSTOMVERTEX vertices[] =
+    CUSTOMVERTEX cubeVertices[] =
     {
         { -3.0f, -3.0f, 3.0f, 0.0f, 0.0f, 1.0f, },    // side 1
         { 3.0f, -3.0f, 3.0f, 0.0f, 0.0f, 1.0f, },
@@ -240,6 +262,7 @@ void init_graphics(void)
         { -3.0f, -3.0f, 3.0f, -1.0f, 0.0f, 0.0f, },
         { -3.0f, 3.0f, -3.0f, -1.0f, 0.0f, 0.0f, },
         { -3.0f, 3.0f, 3.0f, -1.0f, 0.0f, 0.0f, },
+
     };
 
     // create a vertex buffer interface called v_buffer
@@ -247,15 +270,15 @@ void init_graphics(void)
         0,
         CUSTOMFVF,
         D3DPOOL_MANAGED,
-        &v_buffer,
+        &cube_v_buffer,
         NULL);
 
     VOID* pVoid;    // a void pointer
 
     // lock v_buffer and load the vertices into it
-    v_buffer->Lock(0, 0, (void**)&pVoid, 0);
-    memcpy(pVoid, vertices, sizeof(vertices));
-    v_buffer->Unlock();
+    cube_v_buffer->Lock(0, 0, (void**)&pVoid, 0);
+    memcpy(pVoid, cubeVertices, sizeof(cubeVertices));
+    cube_v_buffer->Unlock();
 
     // create the indices using an int array
     short indices[] =
@@ -286,6 +309,44 @@ void init_graphics(void)
     i_buffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, indices, sizeof(indices));
     i_buffer->Unlock();
+}
+
+void init_tetrahedron()
+{
+    CUSTOMVERTEX tetrahedronVertices[] =
+    {
+        // Face 1 (v0, v1, v2)
+        {  1.0f,  7.0f,  1.0f,   0.0f, 0.0f, 1.0f},
+        { -1.0f,  5.0f,  1.0f,   0.0f, 0.0f, 1.0f},
+        { -1.0f,  7.0f, -1.0f,   0.0f, 0.0f, 1.0f},
+        
+        // Face 2 (v0, v3, v1)
+        {  1.0f,  7.0f,  1.0f,   0.0f, 1.0f, 0.0f},
+        {  1.0f,  5.0f, -1.0f,   0.0f, 1.0f, 0.0f},
+        { -1.0f,  5.0f,  1.0f,   0.0f, 1.0f, 0.0f},
+
+        // Face 3 (v0, v2, v3)
+        {  1.0f,  7.0f,  1.0f,   1.0f, 0.0f, 0.0f},
+        { -1.0f,  7.0f, -1.0f,   1.0f, 0.0f, 0.0f},
+        {  1.0f,  5.0f, -1.0f,   1.0f, 0.0f, 0.0f},
+
+        // Face 4 (v1, v3, v2)
+        { -1.0f,  5.0f,  1.0f,   0.0f,-1.0f, 0.0f },
+        {  1.0f,  5.0f, -1.0f,   0.0f,-1.0f, 0.0f },
+        { -1.0f,  7.0f, -1.0f,   0.0f,-1.0f, 0.0f },
+    };
+
+    d3ddev->CreateVertexBuffer(12 * sizeof(CUSTOMVERTEX),
+        0,
+		CUSTOMFVF,
+        D3DPOOL_MANAGED,
+        &tetra_v_buffer,
+        NULL);
+    
+    void* pVertices;
+    tetra_v_buffer->Lock(0, sizeof(tetrahedronVertices), (void**)&pVertices, 0);
+    memcpy(pVertices, tetrahedronVertices, sizeof(tetrahedronVertices));
+    tetra_v_buffer->Unlock();
 }
 
 void init_light()
