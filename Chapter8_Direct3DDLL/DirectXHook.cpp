@@ -117,7 +117,6 @@ void DirectXHook::unhookWithJump(DWORD hookAt, unsigned char* originalBytes) {
 }
 
 DWORD DirectXHook::initHookCallback(LPDIRECT3DDEVICE9 device) {
-	cout << "Running initHookCallback..." << endl;
     DirectXHook::hookedDevice = device;
     while (DirectXHook::originalEndSceneCode == nullptr) {}
     unhookWithJump(DirectXHook::endSceneAddress, DirectXHook::originalEndSceneCode);
@@ -128,7 +127,6 @@ DWORD DirectXHook::initHookCallback(LPDIRECT3DDEVICE9 device) {
 }
 
 DX_API DirectXHook::endSceneHookCallback(LPDIRECT3DDEVICE9 device) {
-    cout << "Running endSceneHookCallback..." << endl;
 	auto result = originalEndScene(device);
     placeHooks();
     return result;
@@ -136,9 +134,11 @@ DX_API DirectXHook::endSceneHookCallback(LPDIRECT3DDEVICE9 device) {
 
 DX_API DirectXHook::drawPrimitiveHookCallback(LPDIRECT3DDEVICE9 device, DWORD primType, UINT StartVertex, UINT PrimitiveCount) 
 {
-	cout << "Running drawPrimitiveHookCallback..." << endl;
-	//this->drawText(10, 10, D3DCOLOR_ARGB(255, 255, 0, 0), "DrawPrimitive called!");
-	return origDrawPrimitive(device, primType, StartVertex, PrimitiveCount);
+	device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE); // Disable depth testing
+    auto result = origDrawPrimitive(device, primType, StartVertex, PrimitiveCount);
+    //hack.handleWallhack(device);
+	device->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE); // Disable depth testing
+    return result;
 }
 
 void DirectXHook::drawText(int x, int y, D3DCOLOR color, const char* text, ...)
@@ -164,8 +164,6 @@ void DirectXHook::drawText(int x, int y, D3DCOLOR color, const char* text, ...)
 
 
 void DirectXHook::placeHooks() {
-    cout << "Placing hooks..." << endl;
-    
     static const DWORD VFHookCount = 2;
     static VFHookInfo vfHooks[VFHookCount] =
     {
@@ -183,10 +181,4 @@ void DirectXHook::placeHooks() {
         }
 	}
     hack.handleHacksOnOff(DirectXHook::hookedDevice);
-    // Here you can place additional hooks or perform other initialization tasks.
-    // For example, you might want to hook other DirectX functions or set up logging.
-    
-    /*
-	* Hooks can be placed here for other DirectX functions.
-    */
 }

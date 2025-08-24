@@ -38,6 +38,7 @@ void init_light(void);    // sets up the light and the material
 
 struct CUSTOMVERTEX { FLOAT X, Y, Z; D3DVECTOR NORMAL; };
 #define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_NORMAL)
+#define CUSTOMFVFTEX (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1)
 
 // the WindowProc function prototype
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -197,7 +198,6 @@ void render_frame(void)
     // select the vertex and index buffers to use
     d3ddev->SetStreamSource(0, cube_v_buffer, 0, sizeof(CUSTOMVERTEX));
     d3ddev->SetIndices(i_buffer);
-
     // draw the cube
     d3ddev->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 24, 0, 12);
 
@@ -316,24 +316,24 @@ void init_tetrahedron()
     CUSTOMVERTEX tetrahedronVertices[] =
     {
         // Face 1 (v0, v1, v2)
-        {  1.0f,  7.0f,  1.0f,   0.0f, 0.0f, 1.0f},
-        { -1.0f,  5.0f,  1.0f,   0.0f, 0.0f, 1.0f},
-        { -1.0f,  7.0f, -1.0f,   0.0f, 0.0f, 1.0f},
+        {  1.0f,  4.0f,  1.0f,   0.0f, 0.0f, 1.0f},
+        { -1.0f,  2.0f,  1.0f,   0.0f, 0.0f, 1.0f},
+        { -1.0f,  4.0f, -1.0f,   0.0f, 0.0f, 1.0f},
         
         // Face 2 (v0, v3, v1)
-        {  1.0f,  7.0f,  1.0f,   0.0f, 1.0f, 0.0f},
-        {  1.0f,  5.0f, -1.0f,   0.0f, 1.0f, 0.0f},
-        { -1.0f,  5.0f,  1.0f,   0.0f, 1.0f, 0.0f},
+        {  1.0f,  4.0f,  1.0f,   0.0f, 1.0f, 0.0f},
+        {  1.0f,  2.0f, -1.0f,   0.0f, 1.0f, 0.0f},
+        { -1.0f,  2.0f,  1.0f,   0.0f, 1.0f, 0.0f},
 
         // Face 3 (v0, v2, v3)
-        {  1.0f,  7.0f,  1.0f,   1.0f, 0.0f, 0.0f},
-        { -1.0f,  7.0f, -1.0f,   1.0f, 0.0f, 0.0f},
-        {  1.0f,  5.0f, -1.0f,   1.0f, 0.0f, 0.0f},
+        {  1.0f,  4.0f,  1.0f,   1.0f, 0.0f, 0.0f},
+        { -1.0f,  4.0f, -1.0f,   1.0f, 0.0f, 0.0f},
+        {  1.0f,  2.0f, -1.0f,   1.0f, 0.0f, 0.0f},
 
         // Face 4 (v1, v3, v2)
-        { -1.0f,  5.0f,  1.0f,   0.0f,-1.0f, 0.0f },
-        {  1.0f,  5.0f, -1.0f,   0.0f,-1.0f, 0.0f },
-        { -1.0f,  7.0f, -1.0f,   0.0f,-1.0f, 0.0f },
+        { -1.0f,  2.0f,  1.0f,   0.0f,-1.0f, 0.0f },
+        {  1.0f,  2.0f, -1.0f,   0.0f,-1.0f, 0.0f },
+        { -1.0f,  4.0f, -1.0f,   0.0f,-1.0f, 0.0f },
     };
 
     d3ddev->CreateVertexBuffer(12 * sizeof(CUSTOMVERTEX),
